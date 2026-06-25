@@ -67,6 +67,18 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     else { video.pause(); setIsPlaying(false); }
   };
 
+  const toggleFullscreen = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if ((video as any).webkitRequestFullscreen) {
+      (video as any).webkitRequestFullscreen();
+    } else if ((video as any).msRequestFullscreen) {
+      (video as any).msRequestFullscreen();
+    }
+  };
+
   return (
     <div
       style={{
@@ -236,6 +248,28 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               boxShadow: `0 0 6px ${accentColor}`,
             }} />
           </div>
+
+          {/* Fullscreen btn */}
+          <button
+            onClick={toggleFullscreen}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              color: accentColor,
+              fontSize: '0.95rem',
+              padding: 0,
+              lineHeight: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              opacity: 0.8,
+              transition: 'opacity 0.2s ease',
+            }}
+            title="ملء الشاشة"
+          >
+            ⛶
+          </button>
         </div>
       </div>
     </div>
