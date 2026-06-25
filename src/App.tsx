@@ -329,9 +329,6 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
     }
   };
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-  };
 
   const toggleFullscreen = () => {
     const video = videoRef.current;
@@ -369,15 +366,15 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
             className="video-fullscreen"
           />
           
-          {/* Floating circular trigger and expandable control panel */}
+          {/* Vertical Speed Dial Controls stacked above the main trigger circle */}
           <div style={{
             position: 'absolute',
             bottom: '2rem',
             right: '2rem',
             display: 'flex',
+            flexDirection: 'column-reverse',
             alignItems: 'center',
-            flexDirection: 'row-reverse',
-            gap: '1rem',
+            gap: '0.8rem',
             zIndex: 1000,
           }}>
             {/* The main trigger circle button */}
@@ -424,88 +421,74 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
               )}
             </button>
 
-            {/* Expanded options panel (slides out to the left) */}
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '1rem',
-              padding: '0.6rem 1.5rem',
-              borderRadius: '100px',
-              background: 'rgba(0, 0, 0, 0.75)',
-              backdropFilter: 'blur(12px)',
-              WebkitBackdropFilter: 'blur(12px)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
-              transform: controlsOpen ? 'translateX(0) scale(1)' : 'translateX(50px) scale(0.8)',
-              opacity: controlsOpen ? 1 : 0,
-              pointerEvents: controlsOpen ? 'auto' : 'none',
-              transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-            }}>
-              {/* Play/Pause Button */}
-              <button
-                onClick={togglePlay}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center',
-                  opacity: 0.85, transition: 'opacity 0.2s'
-                }}
-                title={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
-              >
-                {isPlaying ? '⏸' : '▶'}
-              </button>
-
-              {/* Mute/Unmute Button */}
-              <button
-                onClick={toggleMute}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center',
-                  opacity: 0.85, transition: 'opacity 0.2s'
-                }}
-                title={isMuted ? 'إلغاء كتم الصوت' : 'كتم الصوت'}
-              >
-                {isMuted ? '🔇' : '🔊'}
-              </button>
-
-              {/* Fullscreen Button */}
-              <button
-                onClick={toggleFullscreen}
-                style={{
-                  background: 'none', border: 'none', cursor: 'pointer',
-                  color: '#fff', display: 'flex', alignItems: 'center',
-                  opacity: 0.85, transition: 'opacity 0.2s'
-                }}
-                title="ملء الشاشة"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" />
+            {/* Play/Pause Button (Pops up) */}
+            <button
+              onClick={togglePlay}
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '50%',
+                background: 'rgba(0, 0, 0, 0.75)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+                transform: controlsOpen ? 'scale(1) translateY(0)' : 'scale(0) translateY(30px)',
+                opacity: controlsOpen ? 1 : 0,
+                pointerEvents: controlsOpen ? 'auto' : 'none',
+                transition: 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transitionDelay: controlsOpen ? '0.05s' : '0s',
+              }}
+              title={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
+            >
+              {isPlaying ? (
+                // Pause Icon
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                  <rect x="6" y="4" width="4" height="16" rx="1"></rect>
+                  <rect x="14" y="4" width="4" height="16" rx="1"></rect>
                 </svg>
-              </button>
+              ) : (
+                // Play Icon
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none" style={{ transform: 'translateX(-1px)' }}>
+                  <path d="M8 5v14l11-7z"></path>
+                </svg>
+              )}
+            </button>
 
-              {/* Divider */}
-              <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }} />
-
-              {/* Skip Intro Button */}
-              <button
-                onClick={() => {
-                  setFadeOut(true);
-                  setTimeout(onEnd, 800);
-                }}
-                style={{
-                  background: 'rgba(255,255,255,0.15)',
-                  border: 'none',
-                  cursor: 'pointer',
-                  color: '#fff',
-                  fontFamily: 'var(--font-kufi)',
-                  fontSize: '0.8rem',
-                  padding: '0.35rem 1.1rem',
-                  borderRadius: '50px',
-                  transition: 'background 0.2s ease',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                تخطي ◀
-              </button>
-            </div>
+            {/* Fullscreen Button (Pops up) */}
+            <button
+              onClick={toggleFullscreen}
+              style={{
+                width: '44px',
+                height: '44px',
+                borderRadius: '50%',
+                background: 'rgba(0, 0, 0, 0.75)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.15)',
+                color: '#fff',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 4px 16px rgba(0, 0, 0, 0.3)',
+                transform: controlsOpen ? 'scale(1) translateY(0)' : 'scale(0) translateY(30px)',
+                opacity: controlsOpen ? 1 : 0,
+                pointerEvents: controlsOpen ? 'auto' : 'none',
+                transition: 'opacity 0.25s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transitionDelay: controlsOpen ? '0s' : '0.05s',
+              }}
+              title="ملء الشاشة"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" />
+              </svg>
+            </button>
           </div>
         </div>
       )}
