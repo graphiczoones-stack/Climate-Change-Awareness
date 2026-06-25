@@ -72,6 +72,8 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!video) return;
     if (video.requestFullscreen) {
       video.requestFullscreen();
+    } else if ((video as any).webkitEnterFullscreen) {
+      (video as any).webkitEnterFullscreen();
     } else if ((video as any).webkitRequestFullscreen) {
       (video as any).webkitRequestFullscreen();
     } else if ((video as any).msRequestFullscreen) {
@@ -257,9 +259,7 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
               border: 'none',
               cursor: 'pointer',
               color: accentColor,
-              fontSize: '0.95rem',
               padding: 0,
-              lineHeight: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -268,7 +268,9 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
             }}
             title="ملء الشاشة"
           >
-            ⛶
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" />
+            </svg>
           </button>
         </div>
       </div>
