@@ -49,7 +49,7 @@ export const CameraController: React.FC<CameraControllerProps> = ({
   const targetLook = useRef(new THREE.Vector3(0, 0, 0));
   const isMobile = useAppStore((s) => s.isMobile);
 
-  useFrame(({ size }) => {
+  useFrame(() => {
     // Find surrounding keyframes
     let fromKF = CAMERA_PATH[0];
     let toKF = CAMERA_PATH[1];
