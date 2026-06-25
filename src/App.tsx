@@ -252,6 +252,7 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
   const [isMuted, setIsMuted] = useState(!initialSoundOn);
   const [isPlaying, setIsPlaying] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [controlsOpen, setControlsOpen] = useState(false);
   
   // Initialize orientation synchronously
   const [isPortrait, setIsPortrait] = useState(() => {
@@ -368,84 +369,143 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
             className="video-fullscreen"
           />
           
-          {/* Cinema style controls overlay */}
-          <div className="video-controls-overlay" style={{
+          {/* Floating circular trigger and expandable control panel */}
+          <div style={{
             position: 'absolute',
             bottom: '2rem',
-            left: '50%',
-            transform: 'translateX(-50%)',
+            right: '2rem',
             display: 'flex',
             alignItems: 'center',
-            gap: '1.5rem',
-            padding: '0.8rem 2rem',
-            borderRadius: '100px',
-            background: 'rgba(0,0,0,0.7)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-            border: '1px solid rgba(255,255,255,0.15)',
+            flexDirection: 'row-reverse',
+            gap: '1rem',
             zIndex: 1000,
           }}>
-            {/* Play/Pause Button */}
+            {/* The main trigger circle button */}
             <button
-              onClick={togglePlay}
+              onClick={() => setControlsOpen(!controlsOpen)}
               style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center'
-              }}
-              title={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
-            >
-              {isPlaying ? '⏸' : '▶'}
-            </button>
-
-            {/* Mute/Unmute Button */}
-            <button
-              onClick={toggleMute}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center'
-              }}
-              title={isMuted ? 'إلغاء كتم الصوت' : 'كتم الصوت'}
-            >
-              {isMuted ? '🔇' : '🔊'}
-            </button>
-
-            {/* Fullscreen Button */}
-            <button
-              onClick={toggleFullscreen}
-              style={{
-                background: 'none', border: 'none', cursor: 'pointer',
-                color: '#fff', display: 'flex', alignItems: 'center'
-              }}
-              title="ملء الشاشة"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" />
-              </svg>
-            </button>
-
-            {/* Divider */}
-            <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }} />
-
-            {/* Skip Intro Button */}
-            <button
-              onClick={() => {
-                setFadeOut(true);
-                setTimeout(onEnd, 800);
-              }}
-              style={{
-                background: 'rgba(255,255,255,0.15)',
-                border: 'none',
-                cursor: 'pointer',
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'rgba(0, 0, 0, 0.75)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
                 color: '#fff',
-                fontFamily: 'var(--font-kufi)',
-                fontSize: '0.85rem',
-                padding: '0.4rem 1.2rem',
-                borderRadius: '50px',
-                transition: 'background 0.2s ease',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+                transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                transform: controlsOpen ? 'rotate(90deg)' : 'rotate(0deg)',
               }}
+              title="خيارات التشغيل"
             >
-              تخطي الفيديو ◀
+              {controlsOpen ? (
+                // Close / X icon
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              ) : (
+                // Control/Settings sliders icon
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="4" y1="21" x2="4" y2="14"></line>
+                  <line x1="4" y1="10" x2="4" y2="3"></line>
+                  <line x1="12" y1="21" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12" y2="3"></line>
+                  <line x1="20" y1="21" x2="20" y2="16"></line>
+                  <line x1="20" y1="12" x2="20" y2="3"></line>
+                  <line x1="1" y1="14" x2="7" y2="14"></line>
+                  <line x1="9" y1="8" x2="15" y2="8"></line>
+                  <line x1="17" y1="12" x2="23" y2="12"></line>
+                </svg>
+              )}
             </button>
+
+            {/* Expanded options panel (slides out to the left) */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '1rem',
+              padding: '0.6rem 1.5rem',
+              borderRadius: '100px',
+              background: 'rgba(0, 0, 0, 0.75)',
+              backdropFilter: 'blur(12px)',
+              WebkitBackdropFilter: 'blur(12px)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              transform: controlsOpen ? 'translateX(0) scale(1)' : 'translateX(50px) scale(0.8)',
+              opacity: controlsOpen ? 1 : 0,
+              pointerEvents: controlsOpen ? 'auto' : 'none',
+              transition: 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+            }}>
+              {/* Play/Pause Button */}
+              <button
+                onClick={togglePlay}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center',
+                  opacity: 0.85, transition: 'opacity 0.2s'
+                }}
+                title={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
+              >
+                {isPlaying ? '⏸' : '▶'}
+              </button>
+
+              {/* Mute/Unmute Button */}
+              <button
+                onClick={toggleMute}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center',
+                  opacity: 0.85, transition: 'opacity 0.2s'
+                }}
+                title={isMuted ? 'إلغاء كتم الصوت' : 'كتم الصوت'}
+              >
+                {isMuted ? '🔇' : '🔊'}
+              </button>
+
+              {/* Fullscreen Button */}
+              <button
+                onClick={toggleFullscreen}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: '#fff', display: 'flex', alignItems: 'center',
+                  opacity: 0.85, transition: 'opacity 0.2s'
+                }}
+                title="ملء الشاشة"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" />
+                </svg>
+              </button>
+
+              {/* Divider */}
+              <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }} />
+
+              {/* Skip Intro Button */}
+              <button
+                onClick={() => {
+                  setFadeOut(true);
+                  setTimeout(onEnd, 800);
+                }}
+                style={{
+                  background: 'rgba(255,255,255,0.15)',
+                  border: 'none',
+                  cursor: 'pointer',
+                  color: '#fff',
+                  fontFamily: 'var(--font-kufi)',
+                  fontSize: '0.8rem',
+                  padding: '0.35rem 1.1rem',
+                  borderRadius: '50px',
+                  transition: 'background 0.2s ease',
+                  whiteSpace: 'nowrap',
+                }}
+              >
+                تخطي ◀
+              </button>
+            </div>
           </div>
         </div>
       )}
