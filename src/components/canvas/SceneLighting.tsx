@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAppStore } from '../../store/useAppStore';
 
@@ -7,7 +7,7 @@ interface SceneLightingProps {
   scrollProgress: number;
 }
 
-export const SceneLighting: React.FC<SceneLightingProps> = ({ scrollProgress }) => {
+export const SceneLighting: React.FC<SceneLightingProps> = ({ scrollProgress: _scrollProgress }) => {
   const activeScene = useAppStore((s) => s.activeScene);
   const sunRef = useRef<THREE.DirectionalLight>(null!);
   const fillRef = useRef<THREE.PointLight>(null!);

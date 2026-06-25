@@ -12,14 +12,5 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          three: ['three'],
-          r3f: ['@react-three/fiber', '@react-three/drei'],
-          gsap: ['gsap'],
-        },
-      },
-    },
   },
 });

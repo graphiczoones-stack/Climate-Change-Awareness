@@ -3,7 +3,7 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAppStore } from '../store/useAppStore';
-import { SCENES, TOTAL_SCROLL_HEIGHT } from '../utils/scenes';
+import { SCENES } from '../utils/scenes';
 
 gsap.registerPlugin(ScrollTrigger);
 

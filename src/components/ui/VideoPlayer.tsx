@@ -18,7 +18,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
 }) => {
   const activeScene = useAppStore((s) => s.activeScene);
   const isMuted = useAppStore((s) => s.isMuted);
-  const scrollProgress = useAppStore((s) => s.scrollProgress);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasError, setHasError] = useState(false);
@@ -76,9 +75,6 @@ export const VideoPlayer: React.FC<VideoPlayerProps> = ({
         bottom: window.innerWidth < 768 ? '2rem' : 'auto',
         left: window.innerWidth < 768 ? '50%' : '4rem',
         top: window.innerWidth < 768 ? 'auto' : '50%',
-        transform: window.innerWidth < 768
-          ? 'translateX(-50%)'
-          : 'translateY(-50%)',
         zIndex: 20,
         width: window.innerWidth < 768 ? 'calc(100vw - 4rem)' : '380px',
         opacity: isVisible ? 1 : 0,

@@ -4,7 +4,6 @@ import { useAppStore } from '../../store/useAppStore';
 import { SCENE_CONTENT, SCENES } from '../../utils/scenes';
 
 export const SceneOverlay: React.FC = () => {
-  const scrollProgress = useAppStore((s) => s.scrollProgress);
   const activeScene = useAppStore((s) => s.activeScene);
   const isLoaded = useAppStore((s) => s.isLoaded);
 
@@ -30,7 +29,6 @@ export const SceneOverlay: React.FC = () => {
   if (!isLoaded || !content || activeScene === 'landing') return null;
 
   const accent = currentScene?.accentColor ?? '#00B48A';
-  const isRight = true; // Always position on right for RTL
   const isMobile = window.innerWidth < 768;
 
   return (

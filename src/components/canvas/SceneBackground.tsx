@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import { useAppStore } from '../../store/useAppStore';
 
 // Background plane that changes color/texture per scene
-export const SceneBackground: React.FC<{ scrollProgress: number }> = ({ scrollProgress }) => {
+export const SceneBackground: React.FC<{ scrollProgress: number }> = ({ scrollProgress: _scrollProgress }) => {
   const activeScene = useAppStore((s) => s.activeScene);
   const meshRef = useRef<THREE.Mesh>(null!);
 
@@ -23,7 +23,7 @@ export const SceneBackground: React.FC<{ scrollProgress: number }> = ({ scrollPr
     cta:         ['#001508', '#000a04'],
   };
 
-  const [topHex, botHex] = sceneColors[activeScene] ?? sceneColors['landing'];
+  const [topHex] = sceneColors[activeScene] ?? sceneColors['landing'];
 
   useFrame(() => {
     if (!meshRef.current) return;

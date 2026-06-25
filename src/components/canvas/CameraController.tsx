@@ -83,7 +83,6 @@ export const CameraController: React.FC<CameraControllerProps> = ({
     // Smooth camera movement
     camera.position.lerp(targetPos.current, 0.04);
 
-    const lookTarget = new THREE.Vector3().lerp(targetLook.current, 0.04);
     camera.lookAt(camera.position.clone().add(
       targetLook.current.clone().sub(camera.position).normalize()
     ));

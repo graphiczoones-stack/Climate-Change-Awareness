@@ -7,10 +7,10 @@ interface ParticleSystemProps {
   scrollProgress: number;
 }
 
-export const ParticleSystem: React.FC<ParticleSystemProps> = ({ scrollProgress }) => {
+export const ParticleSystem: React.FC<ParticleSystemProps> = ({ scrollProgress: _scrollProgress }) => {
   const activeScene = useAppStore((s) => s.activeScene);
   const groupRef = useRef<THREE.Group>(null!);
-
+  
   // Determine particle properties per scene
   const config = useMemo(() => {
     const configs: Record<string, {
@@ -56,7 +56,6 @@ export const ParticleSystem: React.FC<ParticleSystemProps> = ({ scrollProgress }
   }, [config]);
 
   const pointsRef = useRef<THREE.Points>(null!);
-  const posRef = useRef<Float32Array>(positions.slice());
 
   useFrame(({ clock }) => {
     if (!pointsRef.current) return;
