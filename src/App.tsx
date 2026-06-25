@@ -250,6 +250,7 @@ interface VideoIntroProps {
 const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted] = useState(!initialSoundOn);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
   
   // Initialize orientation synchronously
@@ -276,21 +277,24 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
     };
   }, []);
 
+  // Autoplay only on mount or when portrait state changes
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
 
-    v.muted = isMuted;
-    
     const playPromise = v.play();
     if (playPromise !== undefined) {
       playPromise
-        .then(() => {})
+        .then(() => {
+          setIsPlaying(true);
+        })
         .catch((err) => {
           console.log('Autoplay blocked. Retrying muted...', err);
           v.muted = true;
           setIsMuted(true);
-          v.play().catch(() => {});
+          v.play()
+            .then(() => setIsPlaying(true))
+            .catch(() => setIsPlaying(false));
         });
     }
 
@@ -303,7 +307,44 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
     return () => {
       v.removeEventListener('ended', onEnded);
     };
-  }, [isPortrait, isMuted, onEnd]);
+  }, [isPortrait, onEnd]);
+
+  // Sync mute state separately
+  useEffect(() => {
+    const v = videoRef.current;
+    if (v) {
+      v.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) {
+      v.play().then(() => setIsPlaying(true));
+    } else {
+      v.pause();
+      setIsPlaying(false);
+    }
+  };
+
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+  };
+
+  const toggleFullscreen = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.requestFullscreen) {
+      video.requestFullscreen();
+    } else if ((video as any).webkitEnterFullscreen) {
+      (video as any).webkitEnterFullscreen();
+    } else if ((video as any).webkitRequestFullscreen) {
+      (video as any).webkitRequestFullscreen();
+    } else if ((video as any).msRequestFullscreen) {
+      (video as any).msRequestFullscreen();
+    }
+  };
 
   return (
     <div className={`video-screen${fadeOut ? ' fade-out' : ''}`}>
@@ -319,12 +360,94 @@ const VideoIntro: React.FC<VideoIntroProps> = ({ initialSoundOn, onEnd }) => {
           </p>
         </div>
       ) : (
-        <video
-          ref={videoRef}
-          src="/videos/main.mp4"
-          playsInline
-          className="video-fullscreen"
-        />
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <video
+            ref={videoRef}
+            src="/videos/main.mp4"
+            playsInline
+            className="video-fullscreen"
+          />
+          
+          {/* Cinema style controls overlay */}
+          <div className="video-controls-overlay" style={{
+            position: 'absolute',
+            bottom: '2rem',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1.5rem',
+            padding: '0.8rem 2rem',
+            borderRadius: '100px',
+            background: 'rgba(0,0,0,0.7)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1px solid rgba(255,255,255,0.15)',
+            zIndex: 1000,
+          }}>
+            {/* Play/Pause Button */}
+            <button
+              onClick={togglePlay}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center'
+              }}
+              title={isPlaying ? 'إيقاف مؤقت' : 'تشغيل'}
+            >
+              {isPlaying ? '⏸' : '▶'}
+            </button>
+
+            {/* Mute/Unmute Button */}
+            <button
+              onClick={toggleMute}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#fff', fontSize: '1.2rem', display: 'flex', alignItems: 'center'
+              }}
+              title={isMuted ? 'إلغاء كتم الصوت' : 'كتم الصوت'}
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+
+            {/* Fullscreen Button */}
+            <button
+              onClick={toggleFullscreen}
+              style={{
+                background: 'none', border: 'none', cursor: 'pointer',
+                color: '#fff', display: 'flex', alignItems: 'center'
+              }}
+              title="ملء الشاشة"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M3 8V5a2 2 0 0 1 2-2h3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M21 16v3a2 2 0 0 1-2 2h-3" />
+              </svg>
+            </button>
+
+            {/* Divider */}
+            <div style={{ width: '1px', height: '20px', background: 'rgba(255,255,255,0.2)' }} />
+
+            {/* Skip Intro Button */}
+            <button
+              onClick={() => {
+                setFadeOut(true);
+                setTimeout(onEnd, 800);
+              }}
+              style={{
+                background: 'rgba(255,255,255,0.15)',
+                border: 'none',
+                cursor: 'pointer',
+                color: '#fff',
+                fontFamily: 'var(--font-kufi)',
+                fontSize: '0.85rem',
+                padding: '0.4rem 1.2rem',
+                borderRadius: '50px',
+                transition: 'background 0.2s ease',
+              }}
+            >
+              تخطي الفيديو ◀
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
